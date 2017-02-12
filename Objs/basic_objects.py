@@ -114,6 +114,9 @@ class BasicUnit(BasicObject):
 
             self.id = obj_list.get_unit(obj=self)[0]
 
+        if self.current_health < 1:
+            obj_list.kill_unit(uid=self.id)
+
 
 class BasicDoodad(BasicObject):
 

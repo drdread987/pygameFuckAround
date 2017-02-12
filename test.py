@@ -27,7 +27,7 @@ class ObjectHandler:
 
         return self.doodad_list
 
-    def get_other_list(self):
+    def gdet_other_list(self):
 
         return self.other_list
 
@@ -81,7 +81,7 @@ class ObjectHandler:
             if doodad[1].eventer:
                 doodad[1].handle_events(events, self)
         for other in self.other_list:
-            if other[1].event:
+            if other[1].eventer:
                 other[1].handle_events(events, self)
 
         for unit in self.unit_list:
@@ -264,6 +264,7 @@ class Engine:
         self.obj_handler.new_doodad(ground.Ground(500, 250))
 
         self.event_box = []
+        self.background = pygame.image.load('images/background/Full-background.png')
 
         self.main_loop()
 
@@ -272,7 +273,7 @@ class Engine:
         while True:
 
             self.clock.tick(30)
-            self.screen.fill(self.black)
+            self.screen.blit(self.background, (0, -700))
 
             for event in pygame.event.get():
 

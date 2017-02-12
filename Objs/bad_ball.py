@@ -46,12 +46,14 @@ class BadBall(basic_objects.BasicUnit):
                     self.found_player = unit[0]
                     player = unit[1]
         else:
-            player = obj_list.get_unit(uid=self.found_player)[1]
+            if obj_list.get_unit(uid=self.found_player) is not None:
+                player = obj_list.get_unit(uid=self.found_player)[1]
 
-        if player.x + (player.width / 2) > self.x + (self.width / 2):
-            self.x += self.current_speed
-        elif player.x + (player.width / 2) < self.x + (self.width / 2):
-            self.x -= self.current_speed
+        if player is not None:
+            if player.x + (player.width / 2) > self.x + (self.width / 2):
+                self.x += self.current_speed
+            elif player.x + (player.width / 2) < self.x + (self.width / 2):
+                self.x -= self.current_speed
 
         for unit in units:
             if unit[1].friendly:

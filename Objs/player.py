@@ -1,5 +1,7 @@
 import pygame
+import spritesheet
 from Objs import basic_objects
+from Objs import icicle
 
 
 class Player(basic_objects.BasicUnit):
@@ -8,20 +10,20 @@ class Player(basic_objects.BasicUnit):
 
         super().__init__(x, y)
 
-        self.current_strength = 5
         self.max_strength = 5
+        self.current_strength = self.max_strength
 
-        self.current_dexterity = 5
         self.max_dexterity = 5
+        self.current_dexterity = self.max_dexterity
 
-        self.current_intelligence = 5
         self.max_intelligence = 5
+        self.current_intelligence = self.max_intelligence
 
-        self.current_regen = 5
         self.max_regen = 5
+        self.current_regen = self.max_regen
 
-        self.current_fortitude = 5
         self.max_fortitude = 5
+        self.current_fortitude = self.max_fortitude
 
         self.max_health = self.current_fortitude * 5
         self.current_health = self.max_health
@@ -34,6 +36,11 @@ class Player(basic_objects.BasicUnit):
 
         self.depth = 1000
 
+        self.direction = "RIGHT"
+
+        self.spell_1_cd_max = 60
+        self.spell_1_cd = self.spell_1_cd_max
+
     def step(self, obj_list):
 
         super().step(obj_list)
@@ -42,18 +49,26 @@ class Player(basic_objects.BasicUnit):
 
         super().handle_events(events, obj_list)
 
-        for event in events:
+        if self.spell_1_cd < self.spell_1_cd_max:
+            self.spell_1_cd += 1
 
-            if event == ord('d'):
+        for event in events:
+            print(event)
+            if event == 275:
                 self.x += self.current_speed
-            elif event == ord('a'):
+                self.direction = "RIGHT"
+            elif event == 276:
                 self.x -= self.current_speed
+                self.direction = "LEFT"
             elif event == ord(' '):
                 self.jump()
-            elif event == ord('s'):
+            elif event == 274:
                 if self.y + self.height < 550 and self.on_ground:
                     self.y += 1
                     self.on_ground = False
+            elif event == ord('1') and self.spell_1_cd == self.spell_1_cd_max:
+                self.spell_1_cd = 0
+                obj_list.new_other(icicle.Icicle(self.x, self.y, self.direction, self.current_intelligence))
 
     def jump(self):
 
