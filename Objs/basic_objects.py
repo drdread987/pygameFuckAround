@@ -20,6 +20,8 @@ class BasicObject:
         self.width = 35
 
         self.jumping = False
+        self.jump_scale = 20
+        self.jump_velocity = self.jump_scale
 
         self.gravity = True
         self.on_ground = False
@@ -46,19 +48,32 @@ class BasicObject:
             for dood in doodads:
                 if dood[1].function == "WALL" and dood[0] != self.id:
                     walls.append(dood[1])
-
+            found_ground = False
             for wall in walls:
 
-                if self.y + self.height + self.gravity_velocity >= wall.y > self.y + self.height:
+                if self.y + self.height + self.gravity_velocity >= wall.y >= self.y + self.height:
 
                     if self.x + self.width >= wall.x and self.x <= wall.x + wall.width:
 
                         self.y = wall.y - self.height
                         self.gravity_velocity = 0
                         self.on_ground = True
+                        found_ground = True
+                        break
+
+            if not found_ground:
+                self.on_ground = False
 
             if not self.on_ground:
                 self.y += self.gravity_velocity
+
+        elif self.jumping:
+            self.y -= self.jump_velocity
+            if self.jump_velocity > 0:
+                self.jump_velocity -= 1
+            elif self.jump_velocity == 0:
+                self.jump_velocity = self.jump_scale
+                self.jumping = False
 
     def draw(self, screen):
 
@@ -75,16 +90,21 @@ class BasicUnit(BasicObject):
 
         super().__init__()
 
-        self.min_health = 1
+        self.current_health = 1
         self.max_health = 1
-        self.min_resource = 1
+        self.current_resource = 1
         self.max_resource = 1
         self.resource_type = 0
-        self.min_speed = 0
+        self.current_speed = 0
         self.max_speed = 0
+
+        self.max_damage = 0
+        self.current_damage = self.max_damage
 
         self.x = x
         self.y = y
+
+        self.player = False
 
     def step(self, obj_list):
 

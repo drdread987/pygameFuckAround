@@ -1,5 +1,8 @@
 import pygame
 import sys
+from Objs import player
+from Objs import ground
+from Objs import bad_ball
 
 # todo make a basic object class
 
@@ -90,14 +93,24 @@ class ObjectHandler:
 
         draw_order = []
         for unit in self.unit_list:
-            draw_order.append([unit.depth, unit])
+            draw_order.append([unit[1].depth, unit, "UNIT"])
         for doodad in self.doodad_list:
-            draw_order.append([doodad.depth, doodad])
+            draw_order.append([doodad[1].depth, doodad, "DOODAD"])
         for other in self.other_list:
-            draw_order.append([other.depth, other])
+            draw_order.append([other[1].depth, other, "OTHER"])
         draw_order.sort()
+        blank_health = pygame.image.load('images/empty_health_bar.png')
+        full_health = pygame.image.load('images/full_health_bar.png')
         for i in draw_order:
-            i[1].draw(screen)
+            i[1][1].draw(screen)
+            if i[2] == "UNIT":
+                health_pct = int((i[1][1].current_health / i[1][1].max_health) * 100)
+                if health_pct < 0:
+                    health_pct = 0
+                scaled_full_health = pygame.transform.scale(full_health, ((int(health_pct / 2)), 10))
+
+                screen.blit(blank_health, ((int((i[1][1].x + (i[1][1].width / 2)) - 25)), int((i[1][1].y - 15))))
+                screen.blit(scaled_full_health, ((int((i[1][1].x + (i[1][1].width / 2)) - 25)), int((i[1][1].y - 15))))
 
     def handle_ids(self):
 
@@ -236,6 +249,19 @@ class Engine:
         self.black = 0, 0, 0
 
         self.obj_handler = ObjectHandler()
+        self.obj_handler.new_unit(player.Player(50, 50))
+        self.obj_handler.new_unit(bad_ball.BadBall(700, 50))
+        self.obj_handler.new_unit(bad_ball.BadBall(600, 50))
+        self.obj_handler.new_unit(bad_ball.BadBall(500, 50))
+        self.obj_handler.new_unit(bad_ball.BadBall(400, 50))
+        self.obj_handler.new_doodad(ground.Ground(0, 550))
+        self.obj_handler.new_doodad(ground.Ground(200, 550))
+        self.obj_handler.new_doodad(ground.Ground(400, 550))
+        self.obj_handler.new_doodad(ground.Ground(600, 550))
+        self.obj_handler.new_doodad(ground.Ground(100, 350))
+        self.obj_handler.new_doodad(ground.Ground(200, 350))
+        self.obj_handler.new_doodad(ground.Ground(100, 150))
+        self.obj_handler.new_doodad(ground.Ground(500, 250))
 
         self.event_box = []
 
@@ -252,7 +278,7 @@ class Engine:
 
                 self.event_handler(event.type, event)
 
-                self.obj_handler.handle_step(self.screen, self.event_box)
+            self.obj_handler.handle_step(self.screen, self.event_box)
 
             pygame.display.flip()
 
